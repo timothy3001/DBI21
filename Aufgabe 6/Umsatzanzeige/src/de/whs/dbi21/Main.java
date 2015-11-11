@@ -18,7 +18,7 @@ public class Main {
 			initiateConnection();
 			while(true) {
 				System.out.println("--------------------------------------------------------------------");
-				System.out.print("Produktid eingeben:  ");				
+				System.out.print("Produktid eingeben: ");				
 				String product = readIn();
 				System.out.println("");
 				if (!product.isEmpty())
