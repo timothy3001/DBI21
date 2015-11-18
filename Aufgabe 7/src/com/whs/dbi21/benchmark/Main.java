@@ -14,7 +14,6 @@ public class Main {
 			dbCon = DriverManager.getConnection(DbConnectionInfo.JDBCSTRING, DbConnectionInfo.DBUSER, DbConnectionInfo.DBPASSWORD);
 			return true;
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;
 		}
@@ -26,6 +25,11 @@ public class Main {
 			System.exit(-1);
 		}			
 		
-				
+		cleanDatabase();				
+	}
+
+	private static boolean cleanDatabase() {
+		//dbCon.createStatement();
+		return false;
 	}
 }
