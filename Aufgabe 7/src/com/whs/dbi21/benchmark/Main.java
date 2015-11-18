@@ -2,7 +2,10 @@ package com.whs.dbi21.benchmark;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+
 import com.whs.dbi21.benchmark.DbConnectionInfo;
 
 public class Main {
@@ -24,12 +27,33 @@ public class Main {
 			System.out.println("Could not establish connection to database!");
 			System.exit(-1);
 		}			
+		System.out.println("Connection to database established!");		
 		
 		cleanDatabase();				
+		System.out.println("Database cleaned!");
+		
 	}
 
 	private static boolean cleanDatabase() {
-		//dbCon.createStatement();
-		return false;
+		Statement st;		
+		try {
+			boolean autoCommit = dbCon.getAutoCommit();
+			
+			dbCon.setAutoCommit(false);
+			st = dbCon.createStatement();			
+			st.addBatch("DELETE FROM accounts;");
+			st.addBatch("DELETE FROM branches;");
+			st.addBatch("DELETE FROM history;");
+			st.addBatch("DELETE FROM tellers;");
+			st.executeBatch();
+			dbCon.commit();
+			st.close();
+			
+			dbCon.setAutoCommit(autoCommit);
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 }
