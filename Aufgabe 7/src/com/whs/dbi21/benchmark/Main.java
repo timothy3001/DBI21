@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Date;
 
 import com.whs.dbi21.benchmark.DbConnectionInfo;
 
@@ -32,6 +33,13 @@ public class Main {
 		cleanDatabase();				
 		System.out.println("Database cleaned!");
 		
+		System.out.println("Start benchmark test!");
+		Date testStart = new Date();
+		// Benchmark-Tasks durchführen		
+		Date testFinish = new Date();
+		
+		long timeUsed = testFinish.getTime() - testStart.getTime();
+		System.out.println("Time used in seconds = " + (double)timeUsed / 1000);		
 	}
 
 	private static boolean cleanDatabase() {
