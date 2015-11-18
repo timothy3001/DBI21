@@ -17,13 +17,13 @@ public class Statements {
 			stmt = pconnection.createStatement();
 			
 			for (int i=0;i<pn;i++)
-				stmt.executeUpdate("INSERT INTO branches " + "VALUES ("+(i+1)+",0,'"+name+"','"+addresslong+"')");
+				stmt.executeUpdate("INSERT INTO branches (branchid, balance, branchname, address) " + "VALUES ("+(i+1)+",0,'"+name+"','"+addresslong+"')");
 			
 			for (int i=0;i<pn*100000;i++)
-				stmt.executeUpdate("INSERT INTO accounts " + "VALUES ("+(i+1)+",0,"+((int)(Math.random()*pn)+1)+",'"+name+"','"+addressshort+"')");
+				stmt.executeUpdate("INSERT INTO accounts (accid, balance, branchid, name, address)" + "VALUES ("+(i+1)+",0,"+((int)(Math.random()*pn)+1)+",'"+name+"','"+addressshort+"')");
 		
 			for (int i=0;i<pn*10;i++)
-				stmt.executeUpdate("INSERT INTO tellers " + "VALUES ("+(i+1)+",0,"+((int)(Math.random()*pn)+1)+",'"+name+"','"+addressshort+"')");
+				stmt.executeUpdate("INSERT INTO tellers (tellerid, balance, branchid, tellername, address)" + "VALUES ("+(i+1)+",0,"+((int)(Math.random()*pn)+1)+",'"+name+"','"+addressshort+"')");
 
 			
 			
