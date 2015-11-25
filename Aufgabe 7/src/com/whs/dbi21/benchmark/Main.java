@@ -79,9 +79,12 @@ public class Main {
         String s = scanner.next();
         try {
             int i = Integer.parseInt(s);
+            scanner.close();
             return i;
         } catch (NumberFormatException e) {
+        	scanner.close();
             return -1;
         }
+        
     }
 }
