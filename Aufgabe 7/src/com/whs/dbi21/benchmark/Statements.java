@@ -15,36 +15,50 @@ public class Statements {
 		String addressshort=createString(68);
 		
 		try {
-			stmt = pconnection.prepareStatement("INSERT INTO branches (branchid, balance, branchname, address) " + "VALUES (?,0,'"+name+"','"+addresslong+"')");
+			
+			pconnection.setAutoCommit(false);
+			stmt = pconnection.prepareStatement("INSERT INTO branches (branchid, balance, branchname, address) " + "VALUES (?,?,?,?)");
 			
 			for (int i=0;i<pn;i++){
 				stmt.setInt(1, i+1);
+				stmt.setInt(2, 0);
+				stmt.setString(3, name);
+				stmt.setString(4, addresslong);
 				stmt.executeUpdate();
 			}
+			pconnection.commit();
 			
 			stmt.close();
 			//stmt.executeUpdate("INSERT INTO branches (branchid, balance, branchname, address) " + "VALUES ("+(i+1)+",0,'"+name+"','"+addresslong+"')");
 			
 			
 			
-			stmt = pconnection.prepareStatement("INSERT INTO accounts (accid, balance, branchid, name, address)" + "VALUES ("+"?"+",0,"+"?"+",'"+name+"','"+addressshort+"')");
+			stmt = pconnection.prepareStatement("INSERT INTO accounts (accid, balance, branchid, name, address)" + "VALUES ("+"?"+",?,"+"?"+",?,?)");
 			
 			for (int i=0;i<pn*100000;i++){
 				stmt.setInt(1, i+1);
-				stmt.setInt(2, ((int)(Math.random()*pn)+1));
+				stmt.setInt(2, 0);
+				stmt.setInt(3, ((int)(Math.random()*pn)+1));
+				stmt.setString(4, name);
+				stmt.setString(5, addressshort);
 				stmt.executeUpdate();
 			}
+			pconnection.commit();
 			
 			stmt.close();
 			
 			
-			stmt = pconnection.prepareStatement("INSERT INTO tellers (tellerid, balance, branchid, tellername, address)" + "VALUES ("+"?"+",0,"+"?"+",'"+name+"','"+addressshort+"')");
+			stmt = pconnection.prepareStatement("INSERT INTO tellers (tellerid, balance, branchid, tellername, address)" + "VALUES ("+"?"+",?,"+"?"+",?,?)");
 			
 			for (int i=0;i<pn*10;i++){
 				stmt.setInt(1, i+1);
-				stmt.setInt(2, ((int)(Math.random()*pn)+1));
+				stmt.setInt(2, 0);
+				stmt.setInt(3, ((int)(Math.random()*pn)+1));
+				stmt.setString(4, name);
+				stmt.setString(5, addressshort);
 				stmt.executeUpdate();
 			}
+			pconnection.commit();
 			
 			stmt.close();
 				//stmt.executeUpdate("INSERT INTO tellers (tellerid, balance, branchid, tellername, address)" + "VALUES ("+(i+1)+",0,"+((int)(Math.random()*pn)+1)+",'"+name+"','"+addressshort+"')");
