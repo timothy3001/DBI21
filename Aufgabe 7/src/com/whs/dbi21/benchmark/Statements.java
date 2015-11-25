@@ -33,7 +33,7 @@ public class Statements {
 			
 			
 			
-			stmt = pconnection.prepareStatement("INSERT INTO accounts (accid, balance, branchid, name, address)" + "VALUES ("+"?"+",?,"+"?"+",?,?)");
+			stmt = pconnection.prepareStatement("INSERT INTO accounts (accid, balance, branchid, name, address)" + "VALUES (?,?,?,?,?)");
 			
 			for (int i=0;i<pn*100000;i++){
 				stmt.setInt(1, i+1);
@@ -48,7 +48,7 @@ public class Statements {
 			stmt.close();
 			
 			
-			stmt = pconnection.prepareStatement("INSERT INTO tellers (tellerid, balance, branchid, tellername, address)" + "VALUES ("+"?"+",?,"+"?"+",?,?)");
+			stmt = pconnection.prepareStatement("INSERT INTO tellers (tellerid, balance, branchid, tellername, address)" + "VALUES (?,?,?,?,?)");
 			
 			for (int i=0;i<pn*10;i++){
 				stmt.setInt(1, i+1);
