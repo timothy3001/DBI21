@@ -59,9 +59,9 @@ public class Main {
 			dbCon.setAutoCommit(false);
 			st = dbCon.createStatement();			
 			st.addBatch("DELETE FROM history;");
-			st.addBatch("DELETE FROM accounts;");
-			st.addBatch("DELETE FROM branches;");			
+			st.addBatch("DELETE FROM accounts;");					
 			st.addBatch("DELETE FROM tellers;");
+			st.addBatch("DELETE FROM branches;");
 			st.executeBatch();
 			dbCon.commit();
 			st.close();
