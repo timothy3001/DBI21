@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Date;
+import java.util.Scanner;
 
 import com.whs.dbi21.benchmark.DbConnectionInfo;
 
@@ -33,9 +34,17 @@ public class Main {
 		cleanDatabase();				
 		System.out.println("Database cleaned!");
 		
+		System.out.print("Please enter a number for n: ");
+		int n = readNumberInInt();
+		if (n < 1) {
+			System.out.println("No valid number for n was entered, using default: 10");
+			n = 10;
+		}
+		
+		
 		System.out.println("Start benchmark test!");
 		Date testStart = new Date();
-		// Benchmark-Tasks durchführen		
+		Statements.createdb(n, dbCon);	
 		Date testFinish = new Date();
 		
 		long timeUsed = testFinish.getTime() - testStart.getTime();
@@ -49,9 +58,9 @@ public class Main {
 			
 			dbCon.setAutoCommit(false);
 			st = dbCon.createStatement();			
-			st.addBatch("DELETE FROM accounts;");
-			st.addBatch("DELETE FROM branches;");
 			st.addBatch("DELETE FROM history;");
+			st.addBatch("DELETE FROM accounts;");
+			st.addBatch("DELETE FROM branches;");			
 			st.addBatch("DELETE FROM tellers;");
 			st.executeBatch();
 			dbCon.commit();
@@ -64,4 +73,15 @@ public class Main {
 			return false;
 		}
 	}
+	
+    private static int readNumberInInt() {
+        Scanner scanner = new Scanner(System.in);
+        String s = scanner.next();
+        try {
+            int i = Integer.parseInt(s);
+            return i;
+        } catch (NumberFormatException e) {
+            return -1;
+        }
+    }
 }
