@@ -24,9 +24,12 @@ public class Statements {
 				stmt.setInt(2, 0);
 				stmt.setString(3, name);
 				stmt.setString(4, addresslong);
-				stmt.executeUpdate();
+				stmt.addBatch();
+				//stmt.executeUpdate();
 			}
-			pconnection.commit();
+			
+			stmt.executeBatch();
+		//	pconnection.commit();
 			
 			stmt.close();
 			//stmt.executeUpdate("INSERT INTO branches (branchid, balance, branchname, address) " + "VALUES ("+(i+1)+",0,'"+name+"','"+addresslong+"')");
@@ -41,9 +44,13 @@ public class Statements {
 				stmt.setInt(3, ((int)(Math.random()*pn)+1));
 				stmt.setString(4, name);
 				stmt.setString(5, addressshort);
-				stmt.executeUpdate();
+				//stmt.executeUpdate();
+				stmt.addBatch();
 			}
-			pconnection.commit();
+			
+			stmt.executeBatch();
+			
+			//pconnection.commit();
 			
 			stmt.close();
 			
@@ -56,8 +63,12 @@ public class Statements {
 				stmt.setInt(3, ((int)(Math.random()*pn)+1));
 				stmt.setString(4, name);
 				stmt.setString(5, addressshort);
-				stmt.executeUpdate();
+				//stmt.executeUpdate();
+				stmt.addBatch();
 			}
+			
+			stmt.executeBatch();
+			
 			pconnection.commit();
 			
 			stmt.close();
