@@ -45,7 +45,6 @@ public class Statements {
 			pconnection.setAutoCommit(false);
 			
 			stmt2 = pconnection.createStatement();
-			stmt2.execute("SET FOREIGN_KEY_CHECKS=1");
 			stmt2.close();
 			pconnection.commit();
 			
@@ -97,7 +96,6 @@ public class Statements {
 			pconnection.commit();
 			
 			stmt2 = pconnection.createStatement();
-			stmt2.execute("SET FOREIGN_KEY_CHECKS=0");
 			stmt2.close();
 			pconnection.commit();
 			
