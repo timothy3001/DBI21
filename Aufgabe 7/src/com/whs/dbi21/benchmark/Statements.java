@@ -33,9 +33,8 @@ public class Statements {
 		String name = createString(20);
 		String addresslong = createString(72);
 		String addressshort = createString(68);
-		//System.out.println(prepareInsertString("blabla",2,5));
-		//System.exit(0);
-		
+
+		// Statements als Strings werden vorgeneriert, dabei wird das Einfügen von bis zu 50000 zeilen in einem Statement verwendet
 		String insertB = prepareInsertString("INSERT INTO branches (branchid, balance, branchname, address) VALUES",4,pn);
 		String insertA = prepareInsertString("INSERT INTO accounts (accid, balance, branchid, name, address) VALUES",5,50000);
 		String insertT = prepareInsertString("INSERT INTO tellers (tellerid, balance, branchid, tellername, address) VALUES",5,pn*10);
@@ -52,8 +51,7 @@ public class Statements {
 			
 			// Verwendung von Prepared Statements (ebenfalls Optimierung)
 			stmt = pconnection.prepareStatement(insertB);
-			//System.out.println(insertB);
-			
+
 			for (int i=0;i<pn;i++){
 				// Einfügen von Datensätzen in die Tabelle "branches" mithilfe der Prepared Statements
 				stmt.setInt(i*4+1, i+1);
@@ -61,12 +59,10 @@ public class Statements {
 				stmt.setString(i*4+3, name);
 				stmt.setString(i*4+4, addresslong);
 			}
-			stmt.executeUpdate();
-			//stmt.addBatch();
 			
-			// Ausführung des ersten Stapels, für die "branches" Tabelle
-			//stmt.executeBatch();			
+			stmt.executeUpdate();		
 			stmt.close();		
+			
 			
 			// INSERT-Statements für die Tabelle "accounts" vorbereiten und ausführen
 			stmt = pconnection.prepareStatement(insertA);
@@ -79,13 +75,10 @@ public class Statements {
 					stmt.setString(i*5+4, name);
 					stmt.setString(i*5+5, addressshort);
 				}
-				//stmt.addBatch();
 				stmt.executeUpdate();
 			}
-			//stmt.executeBatch();
-			
-			
 			stmt.close();
+			
 			
 			// INSERT-Statements für die "tellers" Tabelle vorbereiten und ausführen
 			stmt = pconnection.prepareStatement(insertT);
@@ -97,9 +90,7 @@ public class Statements {
 				stmt.setString(i*5+4, name);
 				stmt.setString(i*5+5, addressshort);
 			}
-			stmt.executeUpdate();
-			//stmt.addBatch();
-			//stmt.executeBatch();
+			stmt.executeUpdate();;
 			stmt.close();
 			
 			// Commit in der Datenbank aufrufen
@@ -134,6 +125,14 @@ public class Statements {
 		return rString;
 	}
 	
+	/**
+	 * Generiert einen String, der ein Multi-Row-Insert-Statement enthält
+	 * 
+	 * @param head Kopf des Insert-Statements bis "Values"
+	 * @param azparam Anzahl der Parameter (Fragezeichen im String) einer Zeile
+	 * @param azwdh Anzahl der Zeilen, die das Statement einfügen soll
+	 * @return Fertiges (Prepared-)Statement als String
+	 */	
 	static String prepareInsertString(String head, int azparam, int azwdh){
 		StringBuilder prepInsert=new StringBuilder();
 		
