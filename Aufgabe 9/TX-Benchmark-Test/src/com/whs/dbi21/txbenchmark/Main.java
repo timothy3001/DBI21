@@ -23,6 +23,13 @@ public class Main {
 			System.exit(-1);
 		}			
 		
+		try {
+			StatementsGenerator.executeInpaymentTx(100, 5, 5, 111, dbCon);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 
 }

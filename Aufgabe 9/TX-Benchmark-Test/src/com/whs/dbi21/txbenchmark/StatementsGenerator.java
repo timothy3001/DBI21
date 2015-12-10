@@ -13,7 +13,7 @@ public class StatementsGenerator {
 		ResultSet rs = st.executeQuery("SELECT balance FROM accounts WHERE accid = " + accId + ";");
 		rs.next();
 		
-		int result = rs.getInt(0);
+		int result = rs.getInt(1);
 		rs.close();
 		st.close();
 		
@@ -36,6 +36,13 @@ public class StatementsGenerator {
 	}
 	
 	public static int executeAnalyseTx(int delta, Connection dbCon) throws SQLException {
-		return 0;
+		Statement st = dbCon.createStatement();
+		
+		ResultSet rs = st.executeQuery("SELECT COUNT(*) FROM history WHERE delta = " + delta + ");");
+		rs.next();		
+		int result = rs.getInt(1);
+		
+		st.close();
+		return result;
 	}
 }
