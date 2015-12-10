@@ -1,28 +1,54 @@
 package com.whs.dbi21.txbenchmark;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class Main {
-
-	private static Connection dbCon;
 	
-	private static void initializeConnection() throws SQLException {
-		dbCon = DriverManager.getConnection(DbConnectionInfo.JDBCSTRING, DbConnectionInfo.DBUSER, DbConnectionInfo.DBPASSWORD);
-	}
+	//TODO Driver.jar Datei einbasteln
+	
+	static ArrayList<LoadDriver> drivers;
 	
 	public static void main(String[] args) {
-		// Herstellen der Verbindung zur Datenbank		
-		try {
-			initializeConnection();
-			System.out.println("Connection to database established!");		
-		} catch (SQLException e) {
-			e.printStackTrace();
-			System.out.println("\nCould not establish connection to database!");			
-			System.exit(-1);
-		}			
+		// Herstellen der Verbindung zur Datenbank	
 		
+		try {
+			Messung(3);
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		System.exit(0);		
+		
+	}
+
+	
+	public static void Messung(int azDriver) throws InterruptedException{
+		int messwert=0;
+		drivers= new ArrayList<LoadDriver>();
+		
+		for(int i=0;i<azDriver;i++){
+			drivers.add(new LoadDriver(i));
+			drivers.get(i).start();
+		}
+		
+		Thread.sleep(2000);
+
+		for(LoadDriver ld: drivers) {
+			ld.starteMessung();
+		}
+		
+		Thread.sleep(3000);		
+		
+		for(LoadDriver ld: drivers) {
+			ld.stoppeMessung();
+			messwert+=ld.getAz();
+		}
+		
+		System.out.println("Messung: "+messwert);
+
+		Thread.sleep(2000);
+
 	}
 
 }
