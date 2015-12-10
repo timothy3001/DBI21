@@ -18,14 +18,15 @@ public class Main {
 			e1.printStackTrace();
 		}
 		
-		System.exit(0);		
-		
+		System.exit(0);
 	}
 
 	
 	public static void Messung(int azDriver) throws InterruptedException{
 		int messwert=0;
 		drivers= new ArrayList<LoadDriver>();
+		
+		System.out.println("Start");
 		
 		for(int i=0;i<azDriver;i++){
 			drivers.add(new LoadDriver(i));
@@ -38,7 +39,7 @@ public class Main {
 			ld.starteMessung();
 		}
 		
-		Thread.sleep(3000);		
+		Thread.sleep(10000);
 		
 		for(LoadDriver ld: drivers) {
 			ld.stoppeMessung();
