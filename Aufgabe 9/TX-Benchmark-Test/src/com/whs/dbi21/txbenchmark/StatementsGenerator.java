@@ -47,7 +47,7 @@ public class StatementsGenerator {
 	public static int executeAnalyseTx(int delta, Connection dbCon) throws SQLException {
 		Statement st = dbCon.createStatement();
 		
-		ResultSet rs = st.executeQuery("SELECT COUNT(*) FROM history WHERE delta = " + delta + ");");
+		ResultSet rs = st.executeQuery("SELECT COUNT(*) FROM history WHERE delta = " + delta + ";");
 		rs.next();		
 		int result = rs.getInt(1);
 		
