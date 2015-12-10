@@ -21,18 +21,27 @@ public class StatementsGenerator {
 	}
 	
 	public static int executeInpaymentTx(int accId, int tellerId, int branchId, int delta, Connection dbCon) throws SQLException {
-		Statement st = dbCon.createStatement();
+		boolean autocommit = dbCon.getAutoCommit();		
+		dbCon.setAutoCommit(false);
 		
-		st.executeUpdate("UPDATE branches SET balance = balance + " + delta + " WHERE branchid = " + branchId + ";");
-		st.executeUpdate("UPDATE tellers SET balance = balance + " + delta + " WHERE tellerid = " + tellerId + ";");
-		st.executeUpdate("UPDATE accounts SET balance = balance + " + delta + " WHERE accid = " + accId + ";");
-		
-		int currentBalance = executeBalanceTx(accId, dbCon);
-		st.executeUpdate("INSERT INTO history (accid, tellerid, delta, branchid, accbalance, cmmnt) VALUES(" + accId + ", " + tellerId + ", " + delta + ", " + branchId + ", " + currentBalance + ", 'INPAYMENT');");
-		
-		st.close();
-		
-		return currentBalance;
+		try {
+			Statement st = dbCon.createStatement();		
+			
+			st.executeUpdate("UPDATE branches SET balance = balance + " + delta + " WHERE branchid = " + branchId + ";");
+			st.executeUpdate("UPDATE tellers SET balance = balance + " + delta + " WHERE tellerid = " + tellerId + ";");
+			st.executeUpdate("UPDATE accounts SET balance = balance + " + delta + " WHERE accid = " + accId + ";");
+			
+			int currentBalance = executeBalanceTx(accId, dbCon);
+			st.executeUpdate("INSERT INTO history (accid, tellerid, delta, branchid, accbalance, cmmnt) VALUES(" + accId + ", " + tellerId + ", " + delta + ", " + branchId + ", " + currentBalance + ", 'INPAYMENT');");
+			
+			dbCon.commit();	
+			
+			st.close();
+			
+			return currentBalance;
+		} finally {
+			dbCon.setAutoCommit(autocommit);
+		}
 	}
 	
 	public static int executeAnalyseTx(int delta, Connection dbCon) throws SQLException {
