@@ -10,6 +10,11 @@ public class LoadDriver extends Thread {
 	
 	private boolean misst;
 	private int az;
+	
+	private int azB=0;
+	private int azI=0;
+	private int azA=0;
+	
 	private int nr;
 	private static Connection dbCon;
 	
@@ -60,11 +65,17 @@ public class LoadDriver extends Thread {
 		int zz=(int) (Math.random()*100);
 		
 		if (zz<35){
-			StatementsGenerator.executeBalanceTx((int) (Math.random()*100000*100), dbCon);
+			StatementsGenerator.executeBalanceTx((int) (Math.random()*100000*100)+1, dbCon);
+			if (misst)
+				azB++;
 		}else if (zz<(50+35)){
-			StatementsGenerator.executeInpaymentTx((int) (Math.random()*100000*100),(int) (Math.random()*10*100),(int) (Math.random()*1*100),(int) (Math.random()*10000)+1, dbCon);
+			StatementsGenerator.executeInpaymentTx((int) (Math.random()*100000*100)+1,(int) (Math.random()*10*100)+1,(int) (Math.random()*1*100)+1,(int) (Math.random()*10000)+1, dbCon);
+			if (misst)
+				azI++;
 		}else{
-			StatementsGenerator.executeAnalyseTx((int) (Math.random()*100000*100), dbCon);
+			StatementsGenerator.executeAnalyseTx((int) (Math.random()*100000*100)+1, dbCon);
+			if (misst)
+				azA++;
 		}
 	}
 	
@@ -75,7 +86,7 @@ public class LoadDriver extends Thread {
 	
 	public void stoppeMessung(){
 		misst=false;
-		System.out.println(nr+": Messung: "+az);
+		System.out.println(nr+": Messung: "+az+" "+azB+" "+azI+" "+azA);
 	}
 	
 	public int getAz(){
