@@ -16,13 +16,13 @@ public class LoadDriver extends Thread {
 	private int azA=0;
 	
 	private int nr;
-	private static Connection dbCon;
+	private Connection dbCon;
 	
 	public static void main(String[] args){
 		
 	}
 	
-	private static void initializeConnection() throws SQLException {
+	private void initializeConnection() throws SQLException {
 		dbCon = DriverManager.getConnection(DbConnectionInfo.JDBCSTRING, DbConnectionInfo.DBUSER, DbConnectionInfo.DBPASSWORD);
 	}
 	
@@ -86,7 +86,7 @@ public class LoadDriver extends Thread {
 	
 	public void stoppeMessung(){
 		misst=false;
-		System.out.println(nr+": Messung: "+az+" "+azB+" "+azI+" "+azA);
+		System.out.println(nr+": Messung: Insgesamt:"+az+" BalanceTx:"+azB+" InpaymentTx:"+azI+" AnalyseTx:"+azA);
 	}
 	
 	public int getAz(){
