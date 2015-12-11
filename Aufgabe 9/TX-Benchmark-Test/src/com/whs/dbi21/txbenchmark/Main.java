@@ -1,54 +1,124 @@
 package com.whs.dbi21.txbenchmark;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class Main {
 	
-	//TODO Driver.jar Datei einbasteln
+	private static ArrayList<LoadDriver> loadDriverList;
+	private static Scanner scanner;
 	
-	static ArrayList<LoadDriver> drivers;
-	
-	public static void main(String[] args) {
-		// Herstellen der Verbindung zur Datenbank	
+	public static void main(String[] args) {	
+		scanner = new Scanner(System.in);
+		
+		System.out.println("Benchmark-Test 2:\n\n");
+		
+		System.out.print("Anzahl LoadDriver: ");
+		int countLoadDriver = readNumberInInt();
+		
+		System.out.print("\nDauer Einschwingphase [in Sekunden, default: 240]: ");
+		int durationFirstPhase = readNumberInInt();
+		durationFirstPhase = durationFirstPhase > 0 ? durationFirstPhase : 240;
+		
+		System.out.print("\nDauer Messphase [in Sekunden, default: 300]: ");
+		int durationSecondPhase = readNumberInInt();
+		durationSecondPhase = durationSecondPhase > 0 ? durationSecondPhase : 300;
+		
+		System.out.print("\nDauer Ausschwingphase [in Sekunden, default: 60]: ");
+		int durationThirdPhase = readNumberInInt();
+		durationThirdPhase = durationThirdPhase > 0 ? durationThirdPhase : 60;		
 		
 		try {
-			Messung(3);
-		} catch (InterruptedException e1) {
-			// TODO Auto-generated catch block
+			System.out.println("\nDatenbank säubern...");
+			cleanDatabase();
+			System.out.println("Datenbank gesäubert!");
+		} catch (SQLException e1) {
 			e1.printStackTrace();
+			System.out.println("Datenbank säubern fehlgeschlagen!\n Terminierung der Anwendung!");
+			System.exit(-1);
+		}		
+		
+		System.out.println("------------------------------------------");
+		System.out.println("Benchmark-Test gestartet!\n");
+		try {
+			loadDriverList = new ArrayList<LoadDriver>();
+			
+			for (int i = 0; i < countLoadDriver; i++) {
+				loadDriverList.add(new LoadDriver(i));	
+			}
+			for (LoadDriver ld : loadDriverList) 
+				ld.start();		
+			
+			Thread.sleep(durationFirstPhase * 1000);
+			
+			for (LoadDriver ld : loadDriverList)
+				ld.startMeasuring();
+			
+			Thread.sleep(durationSecondPhase * 1000);
+			
+			for (LoadDriver ld : loadDriverList)
+				ld.stopMeasuring();
+			
+			Thread.sleep(durationThirdPhase * 1000);
+			
+			for (LoadDriver ld : loadDriverList)
+				ld.stopLoadDriver();
+			
+			System.out.println("------------------------------------------");			
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {			
+			e.printStackTrace();
+			System.out.println("Error bei Verbindung zur DB!\nTerminierung der Anwendung!");
+			System.exit(-1);
 		}
 		
+		System.out.println("Benchmark-Test abgeschlossen!\n\nErgebnisse der einzelnen LoadDriver:\n");
+		
+		int totalCountAllLoadDriver = 0;
+		for (LoadDriver ld : loadDriverList) {
+			System.out.println(ld.getLoadDriverId() + ": | Balance-TXs: " + ld.getCountBalanceTx() +
+					" | Inpayment-TXs: " + ld.getCountInpaymentTx() +
+					" | Analyse-TXs: " + ld.getCountAnalyseTx() +
+					" | Total count: " + ld.getCountTxTotal() +
+					" | Error count: " + ld.getErrorCount());
+			totalCountAllLoadDriver += ld.getCountTxTotal();
+		}
+		
+		System.out.println("\n\nGesamtergebnis: ");
+		System.out.println("Transaktionen gesamt:" + totalCountAllLoadDriver);			
+		System.out.println("Transaktionen pro Sekunde: " +	Math.round(totalCountAllLoadDriver / durationSecondPhase));
+		
+		System.out.println("------------------------------------------");
+		scanner.close();
 		System.exit(0);
 	}
 
-	
-	public static void Messung(int azDriver) throws InterruptedException{
-		int messwert=0;
-		drivers= new ArrayList<LoadDriver>();
+	private static void cleanDatabase() throws SQLException {
+		Connection dbCon = initializeConnection();	
 		
-		System.out.println("Start");
+		Statement st = dbCon.createStatement();
+		st.executeUpdate("DELETE FROM history;");
 		
-		for(int i=0;i<azDriver;i++){
-			drivers.add(new LoadDriver(i));
-			drivers.get(i).start();
-		}
-		
-		Thread.sleep(2000);
-
-		for(LoadDriver ld: drivers) {
-			ld.starteMessung();
-		}
-		
-		Thread.sleep(10000);
-		
-		for(LoadDriver ld: drivers) {
-			ld.stoppeMessung();
-			messwert+=ld.getAz();
-		}
-		
-		System.out.println("Messung: "+messwert);
-
-		Thread.sleep(2000);
+		st.close();
+		dbCon.close();
 	}
 
+	private static int readNumberInInt() {
+        String s = scanner.next();
+        try {
+            int i = Integer.parseInt(s);
+            return i;
+        } catch (NumberFormatException e) {
+            return -1;
+        }        
+    }
+	
+	private static Connection initializeConnection() throws SQLException {
+		return DriverManager.getConnection(DbConnectionInfo.JDBCSTRING, DbConnectionInfo.DBUSER, DbConnectionInfo.DBPASSWORD);
+	}
 }

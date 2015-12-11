@@ -3,93 +3,130 @@ package com.whs.dbi21.txbenchmark;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class LoadDriver extends Thread {
 	
 	//TODO ExceptionHandling gescheit machen
 	
-	private boolean misst;
-	private int az;
+	private boolean isStopped = false;
+	private boolean isMeasuring = false;
 	
-	private int azB=0;
-	private int azI=0;
-	private int azA=0;
+	private int countBalanceTx = 0;
+	private int countInpaymentTx = 0;
+	private int countAnalyseTx = 0;
+	private int errorCount = 0;
 	
-	private int nr;
+	private int loadDriverId;
+
 	private Connection dbCon;
-	
-	public static void main(String[] args){
-		
-	}
 	
 	private void initializeConnection() throws SQLException {
 		dbCon = DriverManager.getConnection(DbConnectionInfo.JDBCSTRING, DbConnectionInfo.DBUSER, DbConnectionInfo.DBPASSWORD);
 	}
 	
-	public LoadDriver(int pnr){
-		nr=pnr;
-		az=0;
+	public LoadDriver(int loadDriverId) throws SQLException{
+		this.loadDriverId = loadDriverId;
 		
+		log("Initializing");
 		try {
 			initializeConnection();
-			System.out.println(nr+": Connection to database established!");		
+			log("Connection to database established");		
 		} catch (SQLException e) {
 			e.printStackTrace();
-			System.out.println(nr+": \nCould not establish connection to database!");			
-			System.exit(-1);
+			log("\nCould not establish connection to database!");			
+			throw e;			
 		}
 	}
 	
 	public void run(){
-		while (true){
+		log("Firing statements");
+		while (!isStopped){
 			try {
 				callStatement();
-			} catch (SQLException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			
-			if (misst)
-				az++;
-			
-			try {
 				Thread.sleep(50);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
+			} catch (SQLException e) {
+				errorCount++;
 				e.printStackTrace();
-			}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}	
+		}
+		log("LoadDriver stopped!");
+		try {
+			dbCon.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
 	}
 	
 	public void callStatement() throws SQLException{
-		int zz=(int) (Math.random()*100);
+		int random = (int) (Math.random() * 100);
 		
-		if (zz<35){
-			StatementsGenerator.executeBalanceTx((int) (Math.random()*100000*100)+1, dbCon);
-			if (misst)
-				azB++;
-		}else if (zz<(50+35)){
-			StatementsGenerator.executeInpaymentTx((int) (Math.random()*100000*100)+1,(int) (Math.random()*10*100)+1,(int) (Math.random()*1*100)+1,(int) (Math.random()*10000)+1, dbCon);
-			if (misst)
-				azI++;
-		}else{
-			StatementsGenerator.executeAnalyseTx((int) (Math.random()*100000*100)+1, dbCon);
-			if (misst)
-				azA++;
+		if (random < 35){
+			StatementsGenerator.executeBalanceTx((int)(Math.random() * 100000 * 100) + 1, dbCon);
+			if (isMeasuring)
+				countBalanceTx++;
+		} else if (random < (50 + 35)) {
+			StatementsGenerator.executeInpaymentTx((int)(Math.random()*100000 * 100) + 1, 
+					(int)(Math.random() * 10 * 100) + 1, 
+					(int)(Math.random() * 1 * 100) + 1, 
+					(int)(Math.random() * 10000) + 1, 
+					dbCon);
+			if (isMeasuring)
+				countInpaymentTx++;
+		} else {
+			StatementsGenerator.executeAnalyseTx((int) (Math.random() * 100000 * 100) + 1, dbCon);
+			if (isMeasuring)
+				countAnalyseTx++;
 		}
 	}
 	
-	public void starteMessung(){
-		misst=true;
-		System.out.println(nr+": starte");
+	public void startMeasuring(){
+		isMeasuring = true;
+		log("Start measuring");
 	}
 	
-	public void stoppeMessung(){
-		misst=false;
-		System.out.println(nr+": Messung: Insgesamt:"+az+" BalanceTx:"+azB+" InpaymentTx:"+azI+" AnalyseTx:"+azA);
+	public void stopMeasuring(){
+		isMeasuring = false;
+		log("Stop measuring");
+		// System.out.println(loadDriverId + ": Messung: BalanceTx:" + countBalanceTx + " InpaymentTx:" + countInpaymentTx + " AnalyseTx:" + countAnalyseTx);
 	}
 	
-	public int getAz(){
-		return az;
+	public int getCountTxTotal(){
+		return countAnalyseTx + countBalanceTx + countInpaymentTx;
+	}
+	
+	public void stopLoadDriver() {
+		isStopped = true;
+	}
+	
+	public int getCountBalanceTx() {
+		return countBalanceTx;
+	}
+
+	public int getCountInpaymentTx() {
+		return countInpaymentTx;
+	}
+
+	public int getCountAnalyseTx() {
+		return countAnalyseTx;
+	}
+	
+	public int getErrorCount() {
+		return errorCount;
+	}
+	
+	public int getLoadDriverId() {
+		return loadDriverId;
+	}
+	
+	private SimpleDateFormat sdf = null;
+	
+	private void log(String msg) {
+		if (sdf == null)
+			sdf = new SimpleDateFormat("HH:mm:ss");
+		System.out.println("[" + sdf.format(new Date()) + "] " + loadDriverId + ": " + msg);
 	}
 }
