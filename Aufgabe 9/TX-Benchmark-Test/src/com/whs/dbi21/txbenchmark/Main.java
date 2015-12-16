@@ -150,7 +150,7 @@ public class Main {
 		
 		// Ausgabe aller Transaktionen gesamt und Ausgabe Transaktionen pro Sekunde
 		System.out.println("\n\nGesamtergebnis: ");
-		System.out.println("Transaktionen gesamt:" + totalCountAllLoadDriver);			
+		System.out.println("Transaktionen gesamt: " + totalCountAllLoadDriver);			
 		System.out.println("Transaktionen pro Sekunde: " +	Math.round(totalCountAllLoadDriver / durationSecondPhase));
 		
 		System.out.println("------------------------------------------");
@@ -168,13 +168,15 @@ public class Main {
 		
 		Statement st = dbCon.createStatement();
 		st.executeUpdate("DELETE FROM history;");
+		st.executeUpdate("SET GLOBAL general_log = 'ON';");
+		st.executeUpdate("SET GLOBAL TRANSACTION ISOLATION LEVEL SERIALIZABLE;");
 		
 		st.close();
 		dbCon.close();
 	}
 
 	/**
-	 * Funktion zum Einlesen eines Integers.
+	 * Funktion zum Einlesen eines Integers aus dem Standardinputstream.
 	 * 
 	 * @return Gibt den eingelesen Integer zurück, bei Fehlerfall -1.
 	 */
