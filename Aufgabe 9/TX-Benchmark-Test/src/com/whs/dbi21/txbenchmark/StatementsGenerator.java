@@ -1,6 +1,5 @@
 package com.whs.dbi21.txbenchmark;
 
-import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,18 +9,24 @@ import java.sql.Statement;
 public class StatementsGenerator {
 
 	private Connection dbCon;
-	private CallableStatement prepStatementBalanceQuery;
-	private CallableStatement prepStatementInpayment;
-	private CallableStatement prepStatementAnalyseQuery;
+	private PreparedStatement prepStatementBalanceQuery;
+	private PreparedStatement prepStatementInpaymentBranches;
+	private PreparedStatement prepStatementInpaymentTellers;
+	private PreparedStatement prepStatementInpaymentAccounts;
+	private PreparedStatement prepStatementInpaymentHistory;
+	private PreparedStatement prepStatementAnalyseQuery;
 	
 	public StatementsGenerator(Connection dbCon) throws SQLException {
 		this.dbCon = dbCon;
 		
-		prepStatementBalanceQuery = dbCon.prepareCall("{call BalanceTx(?)}");
+		prepStatementBalanceQuery = dbCon.prepareStatement("SELECT balance FROM accounts WHERE accid = ?;");
 		
-		prepStatementInpayment = dbCon.prepareCall("{call InpaymentTx(?,?,?,?)}");
-
-		prepStatementAnalyseQuery = dbCon.prepareCall("{AnalyseTx(?)}");
+		prepStatementInpaymentBranches = dbCon.prepareStatement("UPDATE branches SET balance = balance + ? WHERE branchid = ?;");
+		prepStatementInpaymentTellers = dbCon.prepareStatement("UPDATE tellers SET balance = balance + ? WHERE tellerid = ?;");
+		prepStatementInpaymentAccounts = dbCon.prepareStatement("UPDATE accounts SET balance = balance + ? WHERE accid = ?;");
+		prepStatementInpaymentHistory = dbCon.prepareStatement("INSERT INTO history (accid, tellerid, delta, branchid, accbalance, cmmnt) VALUES(?, ?, ?, ?, ?, 'INPAYMENT');");
+		
+		prepStatementAnalyseQuery = dbCon.prepareStatement("SELECT COUNT(*) FROM history WHERE delta = ?;");
 	}
 	
 	/**
@@ -70,27 +75,36 @@ public class StatementsGenerator {
 		try {			
 			// Aktualisierung der Branches-Tabelle. Hier muss die Bilanz der Zweigstelle aufgrund der Einzahlung
 			// aktualisiert werden.
-			prepStatementInpayment.setInt(1, delta);
-			prepStatementInpayment.setInt(2, branchId);
+			prepStatementInpaymentBranches.setInt(1, delta);
+			prepStatementInpaymentBranches.setInt(2, branchId);
+			prepStatementInpaymentBranches.executeUpdate();
 			
 			// Aktualisierung der Tellers-Tabelle. Hier muss die Bilanz des Geldautomatens aufgrund der Einzahlung
 			// aktualisiert werden.
-			prepStatementInpayment.setInt(3, tellerId);
+			prepStatementInpaymentTellers.setInt(1, delta);
+			prepStatementInpaymentTellers.setInt(2, tellerId);
+			prepStatementInpaymentTellers.executeUpdate();
 			
 			// Eigentliche Aktualisierung des Kontostands eines Kontos.
-			prepStatementInpayment.setInt(4, accId);	
-			ResultSet rs = prepStatementInpayment.executeQuery();
+			prepStatementInpaymentAccounts.setInt(1, delta);
+			prepStatementInpaymentAccounts.setInt(2, accId);	
+			prepStatementInpaymentAccounts.executeUpdate();
 			
 			// Abrufen des aktuellen Kontostandes
-			rs.next();		
-			int result = rs.getInt(1);
-			rs.close();
+			int currentBalance = executeBalanceTx(accId);
 			
 			// Einfuegen einer Zeile in die History-Tabelle, die Informationen ueber die aktuelle 
-			//Transaktion enthaelt.			
-			dbCon.commit();
+			//Transaktion enthaelt.
+			prepStatementInpaymentHistory.setInt(1, accId);
+			prepStatementInpaymentHistory.setInt(2, tellerId);
+			prepStatementInpaymentHistory.setInt(3, delta);
+			prepStatementInpaymentHistory.setInt(4, branchId);
+			prepStatementInpaymentHistory.setInt(5, currentBalance);
+			prepStatementInpaymentHistory.executeUpdate();
 			
-			return result;
+			dbCon.commit();	
+			
+			return currentBalance;
 		} finally {
 			// Autocommit wieder auf alten Stand setzen, um weitere Transaktionen nicht zu beeinflussen.
 			dbCon.setAutoCommit(autocommit);
@@ -118,6 +132,9 @@ public class StatementsGenerator {
 	public void closeStatements() throws SQLException {
 		prepStatementAnalyseQuery.close();
 		prepStatementBalanceQuery.close();
-		prepStatementInpayment.close();
+		prepStatementInpaymentAccounts.close();
+		prepStatementInpaymentBranches.close();
+		prepStatementInpaymentHistory.close();
+		prepStatementInpaymentTellers.close();
 	}
 }
