@@ -17,11 +17,11 @@ public class StatementsGenerator {
 	public StatementsGenerator(Connection dbCon) throws SQLException {
 		this.dbCon = dbCon;
 		
-		prepStatementBalanceQuery = dbCon.prepareCall("{call BalanceTx(?, ?)}");
+		prepStatementBalanceQuery = dbCon.prepareCall("{call BalanceTx(?)}");
 		
-		prepStatementInpayment = dbCon.prepareCall("{call InpaymentTx(?,?,?,?, ?)}");
+		prepStatementInpayment = dbCon.prepareCall("{call InpaymentTx(?,?,?,?)}");
 
-		prepStatementAnalyseQuery = dbCon.prepareCall("{call AnalyseTx(?, ?)}");
+		prepStatementAnalyseQuery = dbCon.prepareCall("{AnalyseTx(?)}");
 	}
 	
 	/**
@@ -34,8 +34,12 @@ public class StatementsGenerator {
 	 */
 	public int executeBalanceTx(int accId) throws SQLException {
 		prepStatementBalanceQuery.setInt(1, accId);
-		prepStatementBalanceQuery.execute();	
-		return prepStatementBalanceQuery.getInt(2);
+		ResultSet rs = prepStatementBalanceQuery.executeQuery();
+		
+		rs.next();		
+		int result = rs.getInt(1);
+		rs.close();		
+		return result;
 	}
 	
 	/**
@@ -75,10 +79,12 @@ public class StatementsGenerator {
 			
 			// Eigentliche Aktualisierung des Kontostands eines Kontos.
 			prepStatementInpayment.setInt(4, accId);	
-			prepStatementInpayment.execute();
+			ResultSet rs = prepStatementInpayment.executeQuery();
 			
-			// Abrufen des aktuellen Kontostandes	
-			int result = prepStatementInpayment.getInt(5);
+			// Abrufen des aktuellen Kontostandes
+			rs.next();		
+			int result = rs.getInt(1);
+			rs.close();
 			
 			// Einfuegen einer Zeile in die History-Tabelle, die Informationen ueber die aktuelle 
 			//Transaktion enthaelt.			
@@ -103,9 +109,10 @@ public class StatementsGenerator {
 	 */
 	public int executeAnalyseTx(int delta) throws SQLException {
 		prepStatementAnalyseQuery.setInt(1, delta);
-		prepStatementAnalyseQuery.execute();
+		ResultSet rs = prepStatementAnalyseQuery.executeQuery();
 		
-		return prepStatementAnalyseQuery.getInt(2);
+		rs.next();						
+		return rs.getInt(1);
 	}
 	
 	public void closeStatements() throws SQLException {
