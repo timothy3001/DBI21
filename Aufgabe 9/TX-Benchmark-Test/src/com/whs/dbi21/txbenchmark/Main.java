@@ -171,7 +171,7 @@ public class Main {
 		st.executeUpdate("DELETE FROM history;");
 		
 		// Aktivieren des Transaktionslogs
-		st.executeUpdate("SET GLOBAL general_log = 'ON';");
+		st.executeUpdate("SET GLOBAL general_log = 'OFF';");
 		
 		// Isolationslevel auf Serializable setzen
 		st.executeUpdate("SET GLOBAL TRANSACTION ISOLATION LEVEL SERIALIZABLE;");
