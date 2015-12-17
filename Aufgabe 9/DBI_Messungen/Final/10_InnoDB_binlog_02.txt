@@ -1,0 +1,58 @@
+Benchmark-Test 2:
+
+
+Anzahl LoadDriver: 5
+
+Dauer Einschwingphase [in Sekunden, default: 240]: 240
+
+Dauer Messphase [in Sekunden, default: 300]: 300
+
+Dauer Ausschwingphase [in Sekunden, default: 60]: 60
+
+Datenbank s�ubern...
+Datenbank ges�ubert!
+------------------------------------------
+Benchmark-Test gestartet!
+
+[18:14:07.818] 0: Initializing
+[18:14:07.845] 0: Connection to database established
+[18:14:07.888] 1: Initializing
+[18:14:07.920] 1: Connection to database established
+[18:14:07.929] 2: Initializing
+[18:14:07.966] 2: Connection to database established
+[18:14:07.978] 3: Initializing
+[18:14:08.003] 3: Connection to database established
+[18:14:08.010] 4: Initializing
+[18:14:08.042] 4: Connection to database established
+[18:14:08.050] 0: Firing statements
+[18:14:08.051] 1: Firing statements
+[18:14:08.053] 2: Firing statements
+[18:14:08.055] 3: Firing statements
+[18:14:08.057] 4: Firing statements
+[18:18:08.056] 0: Start measuring
+[18:18:08.057] 1: Start measuring
+[18:18:08.057] 2: Start measuring
+[18:18:08.057] 3: Start measuring
+[18:18:08.058] 4: Start measuring
+[18:23:08.059] 0: Stop measuring
+[18:23:08.059] 1: Stop measuring
+[18:23:08.060] 2: Stop measuring
+[18:23:08.060] 3: Stop measuring
+[18:23:08.060] 4: Stop measuring
+------------------------------------------
+Benchmark-Test abgeschlossen!
+
+Ergebnisse der einzelnen LoadDriver:
+
+0: | Balance-TXs: 844 | Inpayment-TXs: 1204 | Analyse-TXs: 344 | Total count: 2392 | Error count: 0
+1: | Balance-TXs: 804 | Inpayment-TXs: 1233 | Analyse-TXs: 347 | Total count: 2384 | Error count: 0
+2: | Balance-TXs: 823 | Inpayment-TXs: 1208 | Analyse-TXs: 391 | Total count: 2422 | Error count: 0
+3: | Balance-TXs: 811 | Inpayment-TXs: 1220 | Analyse-TXs: 364 | Total count: 2395 | Error count: 0
+4: | Balance-TXs: 858 | Inpayment-TXs: 1204 | Analyse-TXs: 366 | Total count: 2428 | Error count: 0
+
+
+Gesamtergebnis: 
+Transaktionen gesamt: 12021
+Transaktionen pro Sekunde: 40
+------------------------------------------
+

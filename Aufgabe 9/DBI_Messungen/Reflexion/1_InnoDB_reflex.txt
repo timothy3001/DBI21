@@ -1,0 +1,33 @@
+Benchmark-Test 2:
+
+
+Anzahl LoadDriver: 1
+
+Dauer Einschwingphase [in Sekunden, default: 240]: 240
+
+Dauer Messphase [in Sekunden, default: 300]: 300
+
+Dauer Ausschwingphase [in Sekunden, default: 60]: 60
+
+Datenbank säubern...
+Datenbank gesäubert!
+------------------------------------------
+Benchmark-Test gestartet!
+
+[17:37:24.212] 0: Initializing
+[17:37:24.220] 0: Connection to database established
+[17:37:24.269] 0: Firing statements
+[17:41:24.256] 0: Start measuring
+[17:46:24.239] 0: Stop measuring
+------------------------------------------
+Benchmark-Test abgeschlossen!
+
+Ergebnisse der einzelnen LoadDriver:
+
+0: | Balance-TXs: 1573 | Inpayment-TXs: 2295 | Analyse-TXs: 632 | Total count: 4500 | Error count: 0
+
+
+Gesamtergebnis: 
+Transaktionen gesamt: 4500
+Transaktionen pro Sekunde: 15
+------------------------------------------
