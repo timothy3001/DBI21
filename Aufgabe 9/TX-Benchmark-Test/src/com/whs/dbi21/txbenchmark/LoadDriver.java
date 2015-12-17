@@ -11,6 +11,8 @@ public class LoadDriver extends Thread {
 	private boolean isStopped = false;
 	private boolean isMeasuring = false;
 	
+	private StatementsGenerator statementsGenerator;
+	
 	private int countBalanceTx = 0;
 	private int countInpaymentTx = 0;
 	private int countAnalyseTx = 0;
@@ -50,6 +52,8 @@ public class LoadDriver extends Thread {
 			log("\nCould not establish connection to database!");			
 			throw e;			
 		}
+		
+		statementsGenerator = new StatementsGenerator(dbCon);
 	}
 	
 	/**
@@ -78,6 +82,7 @@ public class LoadDriver extends Thread {
 		log("LoadDriver stopped!");
 		try {
 			dbCon.close();
+			statementsGenerator.closeStatements();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -97,21 +102,20 @@ public class LoadDriver extends Thread {
 		// Ausfuehren einer Transaktion abhaengig von der Zufallszahl
 		if (random < 35){
 			// Durchfuehrung einer Transaktionen
-			StatementsGenerator.executeBalanceTx((int)(Math.random() * 100000 * 100) + 1, dbCon);
+			statementsGenerator.executeBalanceTx((int)(Math.random() * 100000 * 100) + 1);
 			// Falls das Messen in diesem LoadDriver aktiviert wurde, wird Zaehler fuer die jeweilige
 			// Transaktion um einen erhoeht.
 			if (isMeasuring)
 				countBalanceTx++;
 		} else if (random < (50 + 35)) {
-			StatementsGenerator.executeInpaymentTx((int)(Math.random() * 100000 * 100) + 1, 
+			statementsGenerator.executeInpaymentTx((int)(Math.random() * 100000 * 100) + 1, 
 					(int)(Math.random() * 10 * 100) + 1, 
 					(int)(Math.random() * 1 * 100) + 1, 
-					(int)(Math.random() * 10000) + 1, 
-					dbCon);
+					(int)(Math.random() * 10000) + 1);
 			if (isMeasuring)
 				countInpaymentTx++;
 		} else {
-			StatementsGenerator.executeAnalyseTx((int) (Math.random() * 100000 * 100) + 1, dbCon);
+			statementsGenerator.executeAnalyseTx((int) (Math.random() * 100000 * 100) + 1);
 			if (isMeasuring)
 				countAnalyseTx++;
 		}
@@ -131,7 +135,6 @@ public class LoadDriver extends Thread {
 	public void stopMeasuring(){
 		isMeasuring = false;
 		log("Stop measuring");
-		// System.out.println(loadDriverId + ": Messung: BalanceTx:" + countBalanceTx + " InpaymentTx:" + countInpaymentTx + " AnalyseTx:" + countAnalyseTx);
 	}
 	
 	/**
@@ -139,7 +142,7 @@ public class LoadDriver extends Thread {
 	 * nicht moeglich.
 	 */
 	public void stopLoadDriver() {
-		isStopped = true;
+		isStopped = true;		
 	}
 	
 	/**

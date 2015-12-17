@@ -166,9 +166,14 @@ public class Main {
 	private static void cleanDatabase() throws SQLException {
 		Connection dbCon = initializeConnection();	
 		
+		// Leeren der History-Tabelle
 		Statement st = dbCon.createStatement();
 		st.executeUpdate("DELETE FROM history;");
+		
+		// Aktivieren des Transaktionslogs
 		st.executeUpdate("SET GLOBAL general_log = 'ON';");
+		
+		// Isolationslevel auf Serializable setzen
 		st.executeUpdate("SET GLOBAL TRANSACTION ISOLATION LEVEL SERIALIZABLE;");
 		
 		st.close();
